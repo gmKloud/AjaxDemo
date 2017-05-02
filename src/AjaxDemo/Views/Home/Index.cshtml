@@ -1,0 +1,118 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>AJAX Demo</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.hello-ajax').click(function () {
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Action("HellaaAjax")', //this URL action needs to be refferred to in the controller for the Ajax call.
+                    success: function (result) {
+                        $('#result1').html(result);
+                    }
+                });
+            });
+            $('.sum').click(function () {
+                $.ajax({
+                    type: 'GET',
+                    data: { firstNumber: 1, secondNumber: 2 }, //arguments we will be putting into constructor in model
+                    url: '@Url.Action("Summy")', //this URL action needs to be refferred to in the controller for the Ajax call.
+                    success: function (result) {
+                        $('#result2').html(result);
+                    }
+                });
+            });
+            $('.display-object').click(function () {
+                $.ajax({
+                    type: 'GET',
+                    dataType: 'json', //datatype = data we expect from the server
+                    contentType: 'application/json', // contentType = what data we are sending to the server
+                    url: '@Url.Action("DisplayObj")',
+                    success: function (destObj) {
+                        var resultString = 'Id: ' + destObj.id + '<br>City ' + destObj.city + '<br>Country: ' + destObj.country;
+                        $('#result3').html(resultString);
+                    }
+                });
+            });
+            $('.part-view').click(function () {
+                $.ajax({
+                    type: 'GET',
+                    datatype: 'html',
+                    url: '@Url.Action("DisplayPartialViewWithAjax")',
+                    success: function (display) {
+                        $('#partViewResult').html(display);
+                    }
+                });
+            });
+            $('.display-random-database-items').submit(function (event) {
+                event.preventDefault();
+                    console.log($(this).serialize());
+                $.ajax({
+                    url: '@Url.Action("RandomDestinationList")',
+                    type: 'GET',
+                    data: $(this).serialize(), //serialize takes form info and turns it into something the controller can read. (the number inputted by user into the form)
+                    dataType: 'json',
+                    success: function (inputToForm) {
+                        var resultHtmlWrapper = '<ul>';
+                        for (var i = 0; i < inputToForm.length; i++) {
+                            resultHtmlWrapper += '<li>' + inputToForm[i].city + ', ' + inputToForm[i].country + '</li>';
+                        }
+                        resultHtmlWrapper += '</ul>';
+                        $('#randomDestResult').html(resultHtmlWrapper);
+                    }
+                });
+            });
+            $('.new-dest').submit(function (event) {
+                event.preventDefault();
+                $.ajax({
+                    url: '@Url.Action("SubmitDest")',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: $(this).serialize(),
+                    success: function (result) {
+                        var resultMessage = 'You have added a new dstination to the database!<br>Id: ' + result.id + '<br>City: ' + result.city + '<br>Country: ' + result.country;
+                        $('#add-dest-disp-area').html(resultMessage);
+                    }
+                });
+            });
+        });// end doc ready bracket
+    </script>
+</head>
+<body>
+    <h2>Basic AJAX</h2>
+    <h4 class="hello-ajax">Hella AJAX</h4>
+    <div id="result1"></div>
+    <hr />
+    <h2>Using Parameters</h2>
+    <h4 class="sum">Sum</h4>
+    <div id="result2"></div>
+    <hr /><hr />
+    <h2>Using JSON to display an object</h2>
+    <h4 class="display-object">Display object</h4>
+    <div id="result3"></div>
+    <hr /><hr /><hr />
+    <h2>Display a Partial View Ex</h2>
+    <h4 class="part-view">Click func for partial view</h4>
+    <div id="partViewResult"></div>
+    <hr /><hr /><hr /><hr />
+    <h2>Using a form to make an Ajax GET request</h2>
+    <form action="RandomDestinationList" class="display-random-database-items">
+        <label for="destinationCount">How many destinations would you like to see?</label>
+        <input type="number" name="destinationCount"/>
+        <button type="submit">Submit</button>
+    </form>
+    <div class="randomDestResult"></div>
+    <hr /><hr /><hr /><hr /><hr />
+    <h2>Submitting info using Ajax POST! - Adding a Destination to the DB using Ajax</h2>
+    <form action="NewDestination" class="new-dest">
+            <label for="newCity">City: </label>
+            <input type="text" name="newCity" />
+            <label for="newCountry">Country: </label>
+            <input type="text" name="newCountry" />
+        <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+    <div id="add-dest-disp-area"></div>
+</body>
+</html>
